@@ -1,11 +1,7 @@
 package org.example.zzazo.domain.user.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.example.zzazo.domain.user.controller.docs.AuthControllerDocs;
 import org.example.zzazo.domain.user.dto.request.EmailVerificationConfirmRequestDto;
 import org.example.zzazo.domain.user.dto.request.EmailVerificationSendRequestDto;
 import org.example.zzazo.domain.user.dto.request.LoginRequestDto;
@@ -19,65 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Auth", description = "인증 API")
 @RestController
 @RequestMapping("/api/auth")
 // 인증 관련 API Controller
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
     // 이메일 인증번호 발송
-    @Operation(
-            summary = "이메일 인증번호 발송 (회원가입 1단계)",
-            description = """
-                    회원가입 화면에서 사용자가 입력한 가천대학교 이메일로 6자리 인증번호를 발송합니다.
-
-                    이메일 도메인은 반드시 @gachon.ac.kr 이어야 합니다.
-                    학교 이메일 형식이 아니면 인증번호를 발송하지 않습니다.
-
-                    [회원가입 전체 흐름]
-                    1단계 - 가천대학교 이메일 입력 후 인증번호 발송 (현재 API)
-                    2단계 - 이메일 인증번호 확인 (/api/auth/email/verify)
-                    3단계 - 나머지 정보 입력 후 최종 회원가입 (/api/auth/signup)
-
-                    이 API만으로는 회원가입이 완료되지 않습니다.
-                    """
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "인증번호 발송 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 200,
-                              "message": "인증번호가 발송되었습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청 (학교 이메일이 아니거나 이메일 형식 오류)",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(
-                                    name = "학교 이메일이 아닌 경우",
-                                    value = """
-                                            {
-                                              "status": 400,
-                                              "message": "가천대학교 이메일(@gachon.ac.kr)만 사용할 수 있습니다."
-                                            }
-                                            """
-                            ),
-                            @ExampleObject(
-                                    name = "이메일 형식이 올바르지 않은 경우",
-                                    value = """
-                                            {
-                                              "status": 400,
-                                              "message": "이메일 형식이 올바르지 않습니다."
-                                            }
-                                            """
-                            )
-                    })
-            )
-    })
+    @Override
     @PostMapping("/email/send")
     public ResponseEntity<ApiResponse<Void>> sendEmailVerification(
             @Valid @RequestBody EmailVerificationSendRequestDto request) {
@@ -85,37 +29,7 @@ public class AuthController {
     }
 
     // 이메일 인증번호 확인
-    @Operation(
-            summary = "이메일 인증번호 확인 (회원가입 2단계)",
-            description = """
-                    회원가입 화면에서 입력한 이메일과 인증번호를 검증합니다.
-
-                    인증 성공 시 해당 이메일은 회원가입 가능한 인증 완료 상태가 됩니다.
-                    이후 회원가입 API(/api/auth/signup) 호출 시 동일한 이메일을 사용해야 합니다.
-                    """
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "인증 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 200,
-                              "message": "이메일 인증이 완료되었습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "인증 실패 또는 잘못된 요청",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 400,
-                              "message": "인증번호가 일치하지 않습니다."
-                            }
-                            """))
-            )
-    })
+    @Override
     @PostMapping("/email/verify")
     public ResponseEntity<ApiResponse<Void>> verifyEmailCode(
             @Valid @RequestBody EmailVerificationConfirmRequestDto request) {
@@ -123,67 +37,7 @@ public class AuthController {
     }
 
     // 회원가입
-    @Operation(
-            summary = "회원가입 (회원가입 3단계)",
-            description = """
-                    이메일 인증 완료 후 최종 회원가입을 진행합니다.
-
-                    요청의 email 필드는 사용자가 직접 다시 입력하는 값이 아닙니다.
-                    회원가입 화면에서 이미 인증 완료된 가천대학교 이메일(@gachon.ac.kr) 값을 그대로 포함해 전송합니다.
-
-                    백엔드는 해당 이메일이 인증 완료 상태인지 확인한 뒤 가입을 처리합니다.
-                    이메일 인증이 완료되지 않았거나 학교 이메일(@gachon.ac.kr)이 아닌 경우 가입이 거부됩니다.
-                    """
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201",
-                    description = "회원가입 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 201,
-                              "message": "success",
-                              "data": {
-                                "userId": 1,
-                                "email": "student@university.ac.kr",
-                                "grade": 2,
-                                "departmentId": 3,
-                                "studentId": 20210001
-                              }
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 400,
-                              "message": "입력값이 올바르지 않습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403",
-                    description = "이메일 인증 미완료",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 403,
-                              "message": "이메일 인증이 완료되지 않았습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "409",
-                    description = "이미 존재하는 이메일",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 409,
-                              "message": "이미 존재하는 이메일입니다."
-                            }
-                            """))
-            )
-    })
+    @Override
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<SignUpResponseDto>> signUp(
             @Valid @RequestBody SignUpRequestDto request) {
@@ -198,43 +52,7 @@ public class AuthController {
     }
 
     // 로그인
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "로그인 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 200,
-                              "message": "success",
-                              "data": {
-                                "userId": 1,
-                                "email": "student@university.ac.kr"
-                              }
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 400,
-                              "message": "입력값이 올바르지 않습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "이메일 또는 비밀번호 불일치",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 401,
-                              "message": "이메일 또는 비밀번호가 일치하지 않습니다."
-                            }
-                            """))
-            )
-    })
+    @Override
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(
             @Valid @RequestBody LoginRequestDto request) {
@@ -246,29 +64,7 @@ public class AuthController {
     }
 
     // 로그아웃
-    @Operation(summary = "로그아웃", description = "로그인된 사용자를 로그아웃합니다.")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "로그아웃 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 200,
-                              "message": "로그아웃 되었습니다."
-                            }
-                            """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "인증되지 않은 사용자",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                            {
-                              "status": 401,
-                              "message": "인증되지 않은 사용자입니다."
-                            }
-                            """))
-            )
-    })
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         return ResponseEntity.ok(ApiResponse.success("로그아웃 되었습니다.", null));
