@@ -1,5 +1,6 @@
 package org.example.zzazo.global.controller;
 
+import org.example.zzazo.global.code.BaseSuccessCode;
 import org.example.zzazo.global.common.ApiResponse;
 import org.example.zzazo.global.common.HealthResponseDto;
 import org.example.zzazo.global.controller.docs.HealthControllerDocs;
@@ -21,6 +22,6 @@ public class HealthController implements HealthControllerDocs {
                 .status("UP")
                 .message("Server is running")
                 .build();
-        return ResponseEntity.ok(ApiResponse.success(data));
+        return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK, data));
     }
 }

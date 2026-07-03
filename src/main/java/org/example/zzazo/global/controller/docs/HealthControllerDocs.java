@@ -27,8 +27,9 @@ public interface HealthControllerDocs {
                     description = "서버 정상 실행 중",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 200,
-                              "message": "success",
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
                               "data": {
                                 "status": "UP",
                                 "message": "Server is running"

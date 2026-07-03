@@ -1,39 +1,43 @@
 package org.example.zzazo.global.common;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+
 @Getter
-@Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-// API 공통 응답 래퍼
-public class ApiResponse<T> {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonPropertyOrder({"isSuccess","code","message","data"})
+public class ApiResponse <T> {
 
-    @Schema(example = "200")
-    private int status;
 
-    @Schema(example = "success")
-    private String message;
+    @JsonProperty("isSuccess")
+    private final boolean success;
+    private final String code;
+    private final String message;
 
-    private T data;
+    private final T data;
 
-    // 데이터 포함 성공 응답 생성
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
-                .status(200)
-                .message("success")
-                .data(data)
-                .build();
+
+    public static <T> ApiResponse<T> success(BaseCode baseCode) {
+        return new ApiResponse<>(true, baseCode.getCode(), baseCode.getMessage(), null);
     }
 
-    // 메시지와 데이터 포함 성공 응답 생성
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return ApiResponse.<T>builder()
-                .status(200)
-                .message(message)
-                .data(data)
-                .build();
+    public static <T> ApiResponse<T> success(BaseCode baseCode,T data) {
+        return new ApiResponse<>(true, baseCode.getCode(), baseCode.getMessage(), data);
     }
+
+    public static <T> ApiResponse<T> failure(BaseCode baseCode) {
+        return new ApiResponse<>(false, baseCode.getCode(), baseCode.getMessage(), null);
+    }
+
+    public static <T> ApiResponse<T> failure(BaseCode baseCode,T error) {
+        return new ApiResponse<>(false, baseCode.getCode(), baseCode.getMessage(), error);
+    }
+
+
 }

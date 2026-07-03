@@ -26,7 +26,8 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/health"
+                                "/api/health",
+                                "/api/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

@@ -50,34 +50,24 @@ public interface AuthControllerDocs {
                     description = "인증번호 발송 성공",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 200,
-                              "message": "인증번호가 발송되었습니다."
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": null
                             }
                             """))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
                     description = "잘못된 요청 (학교 이메일이 아니거나 이메일 형식 오류)",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(
-                                    name = "학교 이메일이 아닌 경우",
-                                    value = """
-                                            {
-                                              "status": 400,
-                                              "message": "가천대학교 이메일(@gachon.ac.kr)만 사용할 수 있습니다."
-                                            }
-                                            """
-                            ),
-                            @ExampleObject(
-                                    name = "이메일 형식이 올바르지 않은 경우",
-                                    value = """
-                                            {
-                                              "status": 400,
-                                              "message": "이메일 형식이 올바르지 않습니다."
-                                            }
-                                            """
-                            )
-                    })
+                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                            {
+                              "isSuccess": false,
+                              "code": "AUTH_400_1",
+                              "message": "가천대학교 이메일(@gachon.ac.kr)만 사용할 수 있습니다.",
+                              "data": null
+                            }
+                            """))
             )
     })
     ResponseEntity<ApiResponse<Void>> sendEmailVerification(EmailVerificationSendRequestDto request);
@@ -107,18 +97,22 @@ public interface AuthControllerDocs {
                     description = "인증 성공",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 200,
-                              "message": "이메일 인증이 완료되었습니다."
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": null
                             }
                             """))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "인증 실패 또는 잘못된 요청",
+                    description = "인증 실패 또는 잘못된 요청 (예: 인증번호 불일치)",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 400,
-                              "message": "인증번호가 일치하지 않습니다."
+                              "isSuccess": false,
+                              "code": "AUTH_400_2",
+                              "message": "인증번호가 일치하지 않습니다.",
+                              "data": null
                             }
                             """))
             )
@@ -156,8 +150,9 @@ public interface AuthControllerDocs {
                     description = "회원가입 성공",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 201,
-                              "message": "success",
+                              "isSuccess": true,
+                              "code": "COMMON_201_1",
+                              "message": "요청 리소스 생성 성공",
                               "data": {
                                 "userId": 1,
                                 "email": "student@university.ac.kr",
@@ -170,11 +165,13 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "잘못된 요청",
+                    description = "잘못된 요청 (입력값 검증 실패)",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 400,
-                              "message": "입력값이 올바르지 않습니다."
+                              "isSuccess": false,
+                              "code": "AUTH_400_3",
+                              "message": "입력값이 올바르지 않습니다.",
+                              "data": null
                             }
                             """))
             ),
@@ -183,8 +180,10 @@ public interface AuthControllerDocs {
                     description = "이메일 인증 미완료",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 403,
-                              "message": "이메일 인증이 완료되지 않았습니다."
+                              "isSuccess": false,
+                              "code": "AUTH_403_1",
+                              "message": "이메일 인증이 완료되지 않았습니다.",
+                              "data": null
                             }
                             """))
             ),
@@ -193,8 +192,10 @@ public interface AuthControllerDocs {
                     description = "이미 존재하는 이메일",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 409,
-                              "message": "이미 존재하는 이메일입니다."
+                              "isSuccess": false,
+                              "code": "AUTH_409_1",
+                              "message": "이미 존재하는 이메일입니다.",
+                              "data": null
                             }
                             """))
             )
@@ -225,8 +226,9 @@ public interface AuthControllerDocs {
                     description = "로그인 성공",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 200,
-                              "message": "success",
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
                               "data": {
                                 "userId": 1,
                                 "email": "student@university.ac.kr"
@@ -236,11 +238,13 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "잘못된 요청",
+                    description = "잘못된 요청 (입력값 검증 실패)",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 400,
-                              "message": "입력값이 올바르지 않습니다."
+                              "isSuccess": false,
+                              "code": "AUTH_400_4",
+                              "message": "입력값이 올바르지 않습니다.",
+                              "data": null
                             }
                             """))
             ),
@@ -249,8 +253,10 @@ public interface AuthControllerDocs {
                     description = "이메일 또는 비밀번호 불일치",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 401,
-                              "message": "이메일 또는 비밀번호가 일치하지 않습니다."
+                              "isSuccess": false,
+                              "code": "AUTH_401_1",
+                              "message": "이메일 또는 비밀번호가 일치하지 않습니다.",
+                              "data": null
                             }
                             """))
             )
@@ -267,8 +273,10 @@ public interface AuthControllerDocs {
                     description = "로그아웃 성공",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 200,
-                              "message": "로그아웃 되었습니다."
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": null
                             }
                             """))
             ),
@@ -277,8 +285,10 @@ public interface AuthControllerDocs {
                     description = "인증되지 않은 사용자",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
-                              "status": 401,
-                              "message": "인증되지 않은 사용자입니다."
+                              "isSuccess": false,
+                              "code": "AUTH_401_2",
+                              "message": "인증되지 않은 사용자입니다.",
+                              "data": null
                             }
                             """))
             )

@@ -8,7 +8,9 @@ import org.example.zzazo.domain.user.dto.request.LoginRequestDto;
 import org.example.zzazo.domain.user.dto.request.SignUpRequestDto;
 import org.example.zzazo.domain.user.dto.response.LoginResponseDto;
 import org.example.zzazo.domain.user.dto.response.SignUpResponseDto;
+import org.example.zzazo.global.code.BaseSuccessCode;
 import org.example.zzazo.global.common.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +27,7 @@ public class AuthController implements AuthControllerDocs {
     @PostMapping("/email/send")
     public ResponseEntity<ApiResponse<Void>> sendEmailVerification(
             @Valid @RequestBody EmailVerificationSendRequestDto request) {
-        return ResponseEntity.ok(ApiResponse.success("인증번호가 발송되었습니다.", null));
+        return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK));
     }
 
     // 이메일 인증번호 확인
@@ -33,7 +35,7 @@ public class AuthController implements AuthControllerDocs {
     @PostMapping("/email/verify")
     public ResponseEntity<ApiResponse<Void>> verifyEmailCode(
             @Valid @RequestBody EmailVerificationConfirmRequestDto request) {
-        return ResponseEntity.ok(ApiResponse.success("이메일 인증이 완료되었습니다.", null));
+        return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK));
     }
 
     // 회원가입
@@ -48,7 +50,7 @@ public class AuthController implements AuthControllerDocs {
                 .departmentId(request.getDepartmentId())
                 .studentId(request.getStudentId())
                 .build();
-        return ResponseEntity.status(201).body(ApiResponse.success(response));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(BaseSuccessCode.GENERAL_CREATED, response));
     }
 
     // 로그인
@@ -60,13 +62,13 @@ public class AuthController implements AuthControllerDocs {
                 .userId(1L)
                 .email(request.getEmail())
                 .build();
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK, response));
     }
 
     // 로그아웃
     @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
-        return ResponseEntity.ok(ApiResponse.success("로그아웃 되었습니다.", null));
+        return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK));
     }
 }
