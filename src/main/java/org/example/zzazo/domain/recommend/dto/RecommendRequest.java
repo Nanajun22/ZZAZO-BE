@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.example.zzazo.domain.recommend.domain.Priority;
 import org.example.zzazo.global.common.Week;
 
 import java.util.List;
@@ -67,8 +66,7 @@ public class RecommendRequest {
                     description = "사용자가 선택한 시간표에 포함할 강의 ID 목록",
                     example = "[13, 16, 17]"
             )
-            List<Long> selectedCourseIds,
-            Priority priority
+            List<Long> selectedCourseIds
             ) {
 
     }
