@@ -24,7 +24,7 @@ public interface LectureControllerDocs {
                     1단계 - 사용자가 전공 강의를 선택합니다. \n
                     2단계 - 사용자가 학과를 선택합니다. \n
                     3단계 - GET /api/v1/lectures/major API를 호출합니다. \n
-                    4단계 - 시스템이 선택한 학과의 전공 강의목록를 반환합니다.
+                    4단계 - 시스템이 사용자가 선택한 학과의 전공 강의목록를 반환합니다.
                     
 
                     """

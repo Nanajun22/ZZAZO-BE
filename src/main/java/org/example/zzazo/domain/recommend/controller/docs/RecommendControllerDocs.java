@@ -3,9 +3,11 @@ package org.example.zzazo.domain.recommend.controller.docs;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.example.zzazo.domain.lecture.dto.LectureResponse;
 import org.example.zzazo.domain.recommend.dto.RecommendRequest;
 import org.example.zzazo.domain.recommend.dto.RecommendResponse;
 import org.example.zzazo.global.common.ApiResponse;
@@ -44,7 +46,10 @@ public interface RecommendControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "조건에 맞는 시간표 추천 성공",
-                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecommendResponse.RecommendResult.class),
+                            examples = @ExampleObject(value = """
                             {
                               "isSuccess": true,
                               "code": "COMMON_200_1",

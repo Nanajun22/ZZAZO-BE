@@ -20,12 +20,12 @@ public class RecommendResponse {
             )
             List<Week> satisfiedFreeDays,
             @Schema(description = "추천 시간표의 강의 목록")
-            List<lecture> timetables
+            List<Lecture> timetables
     ) {
 
     }
 
-    public record lecture(
+    public record Lecture(
             @Schema(description = "강의 ID",example = "1")
             Long lectureId,
             @Schema(description = "강의명",example = "경영학원론")
