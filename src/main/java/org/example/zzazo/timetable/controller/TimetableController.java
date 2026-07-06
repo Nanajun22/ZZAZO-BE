@@ -60,8 +60,13 @@ public class TimetableController {
                     schema = @Schema(implementation = TimetableCreateResponse.class),
                     examples = @ExampleObject(value = """
                             {
-                              "timetableId": 1,
-                              "message": "시간표가 저장되었습니다."
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": {
+                                "timetableId": 1,
+                                "message": "시간표가 저장되었습니다."
+                              }
                             }
                             """)
             )
@@ -88,16 +93,21 @@ public class TimetableController {
                     schema = @Schema(implementation = TimetableListResponse.class),
                     examples = @ExampleObject(value = """
                             {
-                              "timetables": [
-                                {
-                                  "timetableId": 1,
-                                  "candidateName": "공강 조건 중심 시간표",
-                                  "departmentId": 1,
-                                  "totalCredits": 20,
-                                  "preferredFreeDays": ["FRI", "WED"],
-                                  "createdAt": "2026-07-20T12:00:00"
-                                }
-                              ]
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": {
+                                "timetables": [
+                                  {
+                                    "timetableId": 1,
+                                    "candidateName": "공강 조건 중심 시간표",
+                                    "departmentId": 1,
+                                    "totalCredits": 20,
+                                    "preferredFreeDays": ["FRI", "WED"],
+                                    "createdAt": "2026-07-20T12:00:00"
+                                  }
+                                ]
+                              }
                             }
                             """)
             )
@@ -117,7 +127,45 @@ public class TimetableController {
             description = "시간표 상세 조회 성공",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TimetableDetailResponse.class)
+                    schema = @Schema(implementation = TimetableDetailResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "isSuccess": true,
+                              "code": "COMMON_200_1",
+                              "message": "요청 응답 성공",
+                              "data": {
+                                "timetableId": 1,
+                                "candidateName": "공강 조건 중심 시간표",
+                                "departmentId": 1,
+                                "semester": 2,
+                                "grade": 1,
+                                "preferredFreeDays": ["FRI", "WED"],
+                                "targetCredits": 18,
+                                "selectedLectureIds": [13, 17],
+                                "totalCredits": 20,
+                                "requirementCheck": {
+                                  "targetCreditSatisfied": true,
+                                  "requiredCourseIncluded": true,
+                                  "foundationCourseIncluded": true,
+                                  "generalEducationIncluded": true
+                                },
+                                "courses": [
+                                  {
+                                    "lectureId": 13,
+                                    "lectureName": "경영학원론",
+                                    "section": "001",
+                                    "professor": "홍길동",
+                                    "credit": 3,
+                                    "lectureClassification": "전공필수",
+                                    "dayOfWeek": "MON",
+                                    "startTime": "09:00",
+                                    "endTime": "10:15",
+                                    "classroom": "가천관 000호"
+                                  }
+                                ]
+                              }
+                            }
+                            """)
             )
     )
     @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content)
