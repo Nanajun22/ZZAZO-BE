@@ -32,6 +32,10 @@ public class RecommendResponse {
             String lectureName,
             @Schema(description = "학점",example = "3")
             int credit,
+            @Schema(description = "담당교수", example = "홍길동")
+            String professor,
+            @Schema(description = "강의실", example = "가천관612")
+            String classroom,
             @Schema(description = "강의 분류 [전공필수,전공선택,교양필수,교양선택]",example = "전공필수")
             LectureClassification lectureClassification,
             @Schema(description = "강의시간")
