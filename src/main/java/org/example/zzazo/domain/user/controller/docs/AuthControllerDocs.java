@@ -183,7 +183,7 @@ public interface AuthControllerDocs {
                               "message": "요청 리소스 생성 성공",
                               "data": {
                                 "userId": 1,
-                                "email": "student@university.ac.kr",
+                                "email": "@gachon.ac.kr",
                                 "grade": 2,
                                 "departmentId": 3,
                                 "studentId": 20210001
@@ -247,7 +247,8 @@ public interface AuthControllerDocs {
             description = """
                     이메일과 비밀번호로 로그인합니다.
 
-                    로그인에 성공하면 사용자 식별 정보(userId, email)를 반환합니다.
+                    로그인에 성공하면 사용자 식별 정보(userId, email)와 함께 accessToken, refreshToken을 발급합니다.
+                    refreshToken은 서버에 저장되며, 동일 사용자가 재로그인하면 기존 refreshToken은 새 값으로 갱신됩니다.
                     """
     )
     @RequestBody(
@@ -255,7 +256,7 @@ public interface AuthControllerDocs {
             description = "로그인에 사용할 이메일과 비밀번호",
             content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
-                      "email": "student@university.ac.kr",
+                      "email": "student@gachon.ac.kr",
                       "password": "password123!"
                     }
                     """))
@@ -271,7 +272,9 @@ public interface AuthControllerDocs {
                               "message": "요청 응답 성공",
                               "data": {
                                 "userId": 1,
-                                "email": "student@university.ac.kr"
+                                "email": "student@gachon.ac.kr",
+                                "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.accessTokenExample",
+                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.refreshTokenExample"
                               }
                             }
                             """))
@@ -282,9 +285,11 @@ public interface AuthControllerDocs {
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                             {
                               "isSuccess": false,
-                              "code": "AUTH_400_4",
+                              "code": "COMMON_400_2",
                               "message": "입력값이 올바르지 않습니다.",
-                              "data": null
+                              "data": {
+                                "password": "must not be blank"
+                              }
                             }
                             """))
             ),
@@ -296,6 +301,18 @@ public interface AuthControllerDocs {
                               "isSuccess": false,
                               "code": "AUTH_401_1",
                               "message": "이메일 또는 비밀번호가 일치하지 않습니다.",
+                              "data": null
+                            }
+                            """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "이메일 인증 미완료",
+                    content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                            {
+                              "isSuccess": false,
+                              "code": "AUTH_403_1",
+                              "message": "이메일 인증이 완료되지 않았습니다.",
                               "data": null
                             }
                             """))

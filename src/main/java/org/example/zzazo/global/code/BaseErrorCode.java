@@ -22,7 +22,8 @@ public enum BaseErrorCode implements BaseCode {
     EMAIL_VERIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST,"AUTH_400_5","인증 요청 기록이 없습니다. 이메일 인증을 다시 요청해주세요."),
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST,"AUTH_400_6","인증번호가 만료되었습니다. 인증번호를 다시 요청해주세요."),
     EMAIL_NOT_VERIFIED(HttpStatus.FORBIDDEN,"AUTH_403_1","이메일 인증이 완료되지 않았습니다."),
-    EMAIL_ALREADY_REGISTERED(HttpStatus.CONFLICT,"AUTH_409_1","이미 존재하는 이메일입니다.");
+    EMAIL_ALREADY_REGISTERED(HttpStatus.CONFLICT,"AUTH_409_1","이미 존재하는 이메일입니다."),
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED,"AUTH_401_1","이메일 또는 비밀번호가 일치하지 않습니다.");
 
 
     private final HttpStatus status;

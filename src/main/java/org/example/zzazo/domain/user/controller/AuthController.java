@@ -55,10 +55,7 @@ public class AuthController implements AuthControllerDocs {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<UserResponse.LoginResponse>> login(
             @Valid @RequestBody UserRequest.LoginRequest request) {
-        UserResponse.LoginResponse response = UserResponse.LoginResponse.builder()
-                .userId(1L)
-                .email(request.email())
-                .build();
+        UserResponse.LoginResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success(BaseSuccessCode.GENERAL_OK, response));
     }
 

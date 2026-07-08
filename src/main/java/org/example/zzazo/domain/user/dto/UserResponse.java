@@ -13,7 +13,13 @@ public class UserResponse {
             Long userId,
 
             @Schema(example = "student@university.ac.kr")
-            String email
+            String email,
+
+            @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.accessTokenExample")
+            String accessToken,
+
+            @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.refreshTokenExample")
+            String refreshToken
     ) {
     }
 

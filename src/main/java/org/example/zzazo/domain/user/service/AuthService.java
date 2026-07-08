@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.zzazo.domain.user.dto.UserRequest;
 import org.example.zzazo.domain.user.dto.UserResponse;
 import org.example.zzazo.domain.user.entity.EmailVerification;
+import org.example.zzazo.domain.user.entity.RefreshToken;
 import org.example.zzazo.domain.user.entity.User;
 import org.example.zzazo.domain.user.repository.EmailVerificationRepository;
+import org.example.zzazo.domain.user.repository.RefreshTokenRepository;
 import org.example.zzazo.domain.user.repository.UserRepository;
 import org.example.zzazo.global.code.BaseErrorCode;
 import org.example.zzazo.global.error.CustomException;
+import org.example.zzazo.global.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,8 +31,10 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final EmailSenderService emailSenderService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Value("${app.email-verification.expiration-minutes}")
@@ -113,6 +118,42 @@ public class AuthService {
                 .grade(savedUser.getGrade())
                 .departmentId(savedUser.getDepartmentId())
                 .studentId(savedUser.getStudentId())
+                .build();
+    }
+
+    // 로그인
+    @Transactional
+    public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new CustomException(BaseErrorCode.LOGIN_FAILED));
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new CustomException(BaseErrorCode.LOGIN_FAILED);
+        }
+
+        if (!user.isEmailVerified()) {
+            throw new CustomException(BaseErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        String accessToken = jwtProvider.createAccessToken(user.getUserId(), user.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+        LocalDateTime refreshTokenExpiredAt = LocalDateTime.now()
+                .plusSeconds(jwtProvider.getRefreshTokenExpiration() / 1000);
+
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getUserId())
+                .orElseGet(() -> RefreshToken.builder()
+                        .userId(user.getUserId())
+                        .token(refreshToken)
+                        .expiredAt(refreshTokenExpiredAt)
+                        .build());
+        refreshTokenEntity.renew(refreshToken, refreshTokenExpiredAt);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        return UserResponse.LoginResponse.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
