@@ -9,10 +9,10 @@ import org.example.zzazo.domain.user.dto.UserResponse;
 import org.example.zzazo.domain.user.entity.EmailVerification;
 import org.example.zzazo.domain.user.entity.RefreshToken;
 import org.example.zzazo.domain.user.entity.User;
+import org.example.zzazo.domain.user.exception.AuthErrorCode;
 import org.example.zzazo.domain.user.repository.EmailVerificationRepository;
 import org.example.zzazo.domain.user.repository.RefreshTokenRepository;
 import org.example.zzazo.domain.user.repository.UserRepository;
-import org.example.zzazo.global.code.BaseErrorCode;
 import org.example.zzazo.global.error.CustomException;
 import org.example.zzazo.global.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +52,7 @@ public class AuthService {
         validateSchoolEmail(email);
 
         if (userRepository.existsByEmail(email)) {
-            throw new CustomException(BaseErrorCode.EMAIL_ALREADY_REGISTERED);
+            throw new CustomException(AuthErrorCode.EMAIL_ALREADY_REGISTERED);
         }
 
         String verificationCode = generateVerificationCode();
@@ -75,14 +75,14 @@ public class AuthService {
     @Transactional
     public void verifyEmailCode(String email, String verificationCode) {
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(BaseErrorCode.EMAIL_VERIFICATION_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.EMAIL_VERIFICATION_NOT_FOUND));
 
         if (!emailVerification.matchesCode(verificationCode)) {
-            throw new CustomException(BaseErrorCode.VERIFICATION_CODE_MISMATCH);
+            throw new CustomException(AuthErrorCode.VERIFICATION_CODE_MISMATCH);
         }
 
         if (emailVerification.isExpired()) {
-            throw new CustomException(BaseErrorCode.VERIFICATION_CODE_EXPIRED);
+            throw new CustomException(AuthErrorCode.VERIFICATION_CODE_EXPIRED);
         }
 
         emailVerification.verify();
@@ -94,14 +94,14 @@ public class AuthService {
         validateSchoolEmail(request.email());
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new CustomException(BaseErrorCode.EMAIL_ALREADY_REGISTERED);
+            throw new CustomException(AuthErrorCode.EMAIL_ALREADY_REGISTERED);
         }
 
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(request.email())
-                .orElseThrow(() -> new CustomException(BaseErrorCode.EMAIL_NOT_VERIFIED));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.EMAIL_NOT_VERIFIED));
 
         if (!emailVerification.isVerified()) {
-            throw new CustomException(BaseErrorCode.EMAIL_NOT_VERIFIED);
+            throw new CustomException(AuthErrorCode.EMAIL_NOT_VERIFIED);
         }
 
         User user = User.builder()
@@ -128,14 +128,14 @@ public class AuthService {
     @Transactional
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new CustomException(BaseErrorCode.LOGIN_FAILED));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.LOGIN_FAILED));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new CustomException(BaseErrorCode.LOGIN_FAILED);
+            throw new CustomException(AuthErrorCode.LOGIN_FAILED);
         }
 
         if (!user.isEmailVerified()) {
-            throw new CustomException(BaseErrorCode.EMAIL_NOT_VERIFIED);
+            throw new CustomException(AuthErrorCode.EMAIL_NOT_VERIFIED);
         }
 
         String accessToken = jwtProvider.createAccessToken(user.getUserId(), user.getEmail());
@@ -166,13 +166,13 @@ public class AuthService {
         try {
             jwtProvider.parseClaims(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(BaseErrorCode.REFRESH_TOKEN_EXPIRED);
+            throw new CustomException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException(BaseErrorCode.REFRESH_TOKEN_INVALID);
+            throw new CustomException(AuthErrorCode.REFRESH_TOKEN_INVALID);
         }
 
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new CustomException(BaseErrorCode.REFRESH_TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         refreshTokenRepository.delete(refreshTokenEntity);
     }
@@ -184,17 +184,17 @@ public class AuthService {
         try {
             claims = jwtProvider.parseClaims(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(BaseErrorCode.REFRESH_TOKEN_EXPIRED);
+            throw new CustomException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException(BaseErrorCode.REFRESH_TOKEN_INVALID);
+            throw new CustomException(AuthErrorCode.REFRESH_TOKEN_INVALID);
         }
 
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new CustomException(BaseErrorCode.REFRESH_TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         Long userId = Long.parseLong(claims.getSubject());
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(BaseErrorCode.TOKEN_USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.TOKEN_USER_NOT_FOUND));
 
         String newAccessToken = jwtProvider.createAccessToken(user.getUserId(), user.getEmail());
         String newRefreshToken = jwtProvider.createRefreshToken(user.getUserId());
@@ -213,7 +213,7 @@ public class AuthService {
 
     private void validateSchoolEmail(String email) {
         if (!SCHOOL_EMAIL_PATTERN.matcher(email).matches()) {
-            throw new CustomException(BaseErrorCode.INVALID_SCHOOL_EMAIL);
+            throw new CustomException(AuthErrorCode.INVALID_SCHOOL_EMAIL);
         }
     }
 
