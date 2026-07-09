@@ -7,6 +7,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.example.zzazo.domain.lecture.domain.LiberalCategory;
 import org.example.zzazo.domain.lecture.dto.LectureResponse;
 import org.example.zzazo.global.common.ApiResponse;
@@ -116,6 +120,8 @@ public interface LectureControllerDocs {
                 example = "1",
                 required = true
             )
+
+            @NotNull @Positive
             Long departmentId,
             @Parameter(
                     description = "사용자가 조회하고자 하는 과목 목록 학기 정보입니다. STEP 1.의 기본정보 확인에서 입력한 학기 정보를 사용합니다. \n" +
@@ -123,7 +129,9 @@ public interface LectureControllerDocs {
                     example = "2",
                     required = true
             )
-            int semester
+            @NotNull
+            @Min(1) @Max(2)
+            Integer semester
     );
 
 
@@ -234,6 +242,7 @@ public interface LectureControllerDocs {
                     example = "COMMUNICATION",
                     required = true
             )
+
             LiberalCategory liberalCategory,
             @Parameter(
                     description = "사용자가 조회하고자 하는 과목 목록 학기 정보입니다. STEP 1.의 기본정보 확인에서 입력한 학기 정보를 사용합니다. \n" +
@@ -241,7 +250,9 @@ public interface LectureControllerDocs {
                     example = "2",
                     required = true
             )
-            int semester
+            @NotNull
+            @Min(1) @Max(2)
+            Integer semester
     );
 
 
