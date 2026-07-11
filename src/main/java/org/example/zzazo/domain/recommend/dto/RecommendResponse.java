@@ -2,6 +2,8 @@ package org.example.zzazo.domain.recommend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import org.example.zzazo.domain.LectureSchedule.entity.LectureSchedule;
 import org.example.zzazo.domain.lecture.domain.LectureClassification;
 import org.example.zzazo.global.common.Week;
 
@@ -25,6 +27,7 @@ public class RecommendResponse {
 
     }
 
+    @Builder
     public record Lecture(
             @Schema(description = "강의 ID",example = "1")
             Long lectureId,
@@ -41,6 +44,26 @@ public class RecommendResponse {
             @Schema(description = "강의시간")
             List<LectureTime> lectureTime
             ) {
+        public static Lecture from(
+                Long lectureId,
+                String lectureName,
+                int credit,
+                String professor,
+                String classroom,
+                LectureClassification lectureClassification,
+                List<LectureTime> lectureTime
+        ) {
+            return new Lecture(
+                    lectureId,
+                    lectureName,
+                    credit,
+                    professor,
+                    classroom,
+                    lectureClassification,
+                    lectureTime
+            );
+        }
+
         public record LectureTime(
                 @Schema(description = "강의 시작시간",example = "13:00")
                 @JsonFormat(pattern = "HH:mm")
@@ -51,6 +74,9 @@ public class RecommendResponse {
                 @Schema(description = "강의 요일",example = "MON")
                 Week dayOfWeek
         ) {
+            public static LectureTime from(LocalTime startTime,LocalTime endTime,Week dayOfWeek) {
+                return new LectureTime(startTime,endTime,dayOfWeek);
+            }
 
         }
     }
