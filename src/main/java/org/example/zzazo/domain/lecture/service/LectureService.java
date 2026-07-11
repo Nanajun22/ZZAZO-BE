@@ -4,6 +4,7 @@ package org.example.zzazo.domain.lecture.service;
 import lombok.RequiredArgsConstructor;
 import org.example.zzazo.domain.curriculum.entity.Curriculum;
 import org.example.zzazo.domain.curriculum.repository.CurriculumRepository;
+import org.example.zzazo.domain.department.repository.DepartmentRepository;
 import org.example.zzazo.domain.lecture.domain.LiberalCategory;
 import org.example.zzazo.domain.lecture.dto.LectureResponse;
 import org.example.zzazo.domain.lecture.entity.Lecture;
@@ -20,9 +21,14 @@ public class LectureService {
 
     private final LectureRepository lectureRepository;
     private final CurriculumRepository curriculumRepository;
+    private final DepartmentRepository departmentRepository;
     //전공 과목목록 조회
     public LectureResponse.LectureList getMajorList(Long departmentId,int semester) {
-        List<Curriculum> curriculumList = curriculumRepository.findAllByDepartmentIdWithLectureAndSchedules(departmentId,semester);
+
+
+
+        List<Curriculum> curriculumList = curriculumRepository
+                .findMajorCurriculumsByDepartmentIdAndSemester(departmentId,semester);
 
         List<LectureResponse.Lecture> lectureList = curriculumList.stream()
                 .map(c -> LectureResponse.Lecture.builder()
