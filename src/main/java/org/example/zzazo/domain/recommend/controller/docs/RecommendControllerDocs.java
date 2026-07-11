@@ -153,16 +153,10 @@ public interface RecommendControllerDocs {
                                               "isSuccess": false,
                                               "code": "VALIDATION_400_1",
                                               "message": "입력값이 올바르지 않습니다.",
-                                              "data": [
-                                                {
-                                                  "field": "preferredFreeDays",
-                                                  "message": "공강 요일은 최대 2개까지 선택할 수 있습니다."
-                                                },
-                                                {
-                                                  "field": "targetCredits",
-                                                  "message": "목표 학점은 30학점을 초과할 수 없습니다."
-                                                }
-                                              ]
+                                              "data": {
+                                                "preferredFreeDays": "공강 요일은 최대 2개까지 선택할 수 있습니다.",
+                                                "targetCredits": "목표 학점은 30학점을 초과할 수 없습니다."
+                                              }
                                             }
                                             """)
                             }
@@ -176,7 +170,6 @@ public interface RecommendControllerDocs {
                             사용자가 입력한 학과가 존재하지 않는 케이스입니다. \n
                             [RECOMMEND_404_2] \n
                             사용자가 입력한 강의가 존재하지 않는 케이스입니다. \n
-                            예외를 발생시킨 강의목록을 반환합니다. \n
                             [RECOMMEND_404_3] \n
                             사용자가 선택한 조건에 맞는 시간표가 존재하지 않는 케이스입니다. \n
                             """,
@@ -195,7 +188,7 @@ public interface RecommendControllerDocs {
                                               "isSuccess": false,
                                               "code": "RECOMMEND_404_2",
                                               "message": "존재하지 않는 강의입니다.",
-                                              "data": [998,999]
+                                              "data": null
                                             }
                                             """),
                                     @ExampleObject(name = "RECOMMEND_404_3", value = """

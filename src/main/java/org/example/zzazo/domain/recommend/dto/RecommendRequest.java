@@ -75,5 +75,10 @@ public class RecommendRequest {
             Priority priority
             ) {
 
+            public createRecommendRequest {
+                    selectedLectureIds = selectedLectureIds == null ? List.of() : selectedLectureIds;
+                    preferredFreeDays = preferredFreeDays == null ? List.of() : preferredFreeDays;
+            }
+
     }
 }

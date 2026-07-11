@@ -86,16 +86,10 @@ public interface LectureControllerDocs {
                               "isSuccess": false,
                               "code": "VALIDATION_400_1",
                               "message": "입력값이 올바르지 않습니다.",
-                              "data": [
-                                {
-                                  "field": "semester",
-                                  "message": "학기 정보는 필수입니다."
-                                },
-                                {
-                                  "field": "departmentId",
-                                  "message": "학과 정보는 필수입니다."
-                                }
-                              ]
+                              "data": {
+                                "semester": "학기 정보는 필수입니다.",
+                                "departmentId": "학과 정보는 필수입니다."
+                              }
                             }
                             """))
             ),
@@ -203,16 +197,10 @@ public interface LectureControllerDocs {
                               "isSuccess": false,
                               "code": "VALIDATION_400_1",
                               "message": "입력값이 올바르지 않습니다.",
-                              "data": [
-                                {
-                                  "field": "semester",
-                                  "message": "학기 정보는 필수입니다."
-                                },
-                                {
-                                  "field": "liberalCategory",
-                                  "message": "교양 분류 정보는 필수입니다."
-                                }
-                              ]
+                              "data": {
+                                "semester": "학기 정보는 필수입니다.",
+                                "liberalCategory": "교양 분류 정보는 필수입니다."
+                              }
                             }
                             """),
                             @ExampleObject(name = "TYPE_MISMATCH_400_1", value = """

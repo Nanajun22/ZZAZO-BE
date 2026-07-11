@@ -9,7 +9,9 @@ import org.example.zzazo.domain.lecture.entity.Lecture;
 import org.example.zzazo.domain.lecture.repository.LectureRepository;
 import org.example.zzazo.domain.recommend.dto.RecommendRequest;
 import org.example.zzazo.domain.recommend.dto.RecommendResponse;
+import org.example.zzazo.domain.recommend.exception.RecommendErrorCode;
 import org.example.zzazo.global.common.Week;
+import org.example.zzazo.global.error.CustomException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,13 +27,9 @@ public class RecommendService {
 
     public RecommendResponse.RecommendResult recommendTimeTable(RecommendRequest.createRecommendRequest request) {
 
-        departmentRepository.findById(request.departmentId()).orElseThrow(()-> new IllegalArgumentException("학과가 없어요"));
-
-        //공강 요일 2개 넘을 시 예외처리
-        if(request.preferredFreeDays() != null && request.preferredFreeDays().size()>2) {
-            throw new IllegalArgumentException("공강 요일은 2개 넘을수없서용" + request.preferredFreeDays());
-        }
-
+        departmentRepository.findById(request.departmentId())
+                .orElseThrow(()-> new CustomException(RecommendErrorCode.DEPARTMENT_NOT_EXISTS)
+        );
 
         //학과 커리큘럼 과목목록 가져오기
         List<Curriculum> curriculumList = request.preferredFreeDays() == null || request.preferredFreeDays().isEmpty()
@@ -48,48 +46,13 @@ public class RecommendService {
                         );
 
 
+        // 사용자가 지정한 필수과목부터 확정
+        List<Lecture> selected = putRequired(request);
+        int totalCredit = selected.stream().mapToInt(Lecture::getCredit).sum();
 
-        List<Lecture> selected = new ArrayList<>();
-        int totalCredit = 0;
 
 
-        // 1. 사용자가 지정한 필수과목부터 확정
-        List<Long> requiredIds = request.selectedLectureIds() == null
-                ? List.of() : request.selectedLectureIds();
-
-        if(requiredIds.stream().distinct().toList().size() != requiredIds.size()) {
-            throw new IllegalArgumentException("중복된 강의 입니다");
-        }
-
-        Map<Long, Lecture> lectureById = lectureRepository.findAllByIdInWithSchedules(requiredIds).stream()
-                .collect(Collectors.toMap(Lecture::getId, l -> l));
-
-        if(lectureById.values().stream().mapToInt(Lecture::getCredit).sum() >= 30) {
-            throw new IllegalArgumentException("30 학점이 넘습니다.");
-        }
-
-        for (Long lectureId : requiredIds) {
-            Lecture lecture = lectureById.getOrDefault(lectureId,null);
-            if (lecture == null) {
-                throw new IllegalArgumentException("존재하지 않는 과목입니다. lectureId=" + lectureId);
-            }
-
-            if(lecture.getLectureSchedules().stream().map(LectureSchedule::getDayOfWeek)
-                    .anyMatch(request.preferredFreeDays()::contains)) {
-                throw new IllegalArgumentException("공강요일인 과목은 선택할 수 없습니다.");
-            }
-
-            if(lecture.getSemester() != request.semester()) {
-                throw new IllegalArgumentException("해당 학기에 개설된 강의가 아닙니다."+lectureId);
-            }
-            if (hasTimeConflict(lecture, selected)) {
-                throw new IllegalArgumentException("지정한 과목끼리 시간이 겹칩니다. lectureId=" + lectureId);
-            }
-            selected.add(lecture);
-            totalCredit += lecture.getCredit();
-        }
-
-        // 2. 나머지 후보 정렬: 필수 여부 -> 본인학년 이하 여부 -> 학년 오름차순 -> 학점 오름차순(많이 채우기 위한 tie-breaker)
+        // 나머지 후보 정렬: 필수 여부 -> 본인학년 이하 여부 -> 학년 오름차순 -> 학점 오름차순
         Set<Long> selectedIds = selected.stream()
                 .map(Lecture::getId)
                 .collect(Collectors.toSet());
@@ -99,7 +62,7 @@ public class RecommendService {
                 .sorted(priorityComparator(request.grade()))
                 .toList();
 
-        // 3. 목표학점 도달 전까지 그리디하게 채우기
+        // 목표학점 도달 전까지 그리디하게 채우기
         for (Curriculum candidate : candidates) {
             if (totalCredit >= request.targetCredits()) {
                 break;
@@ -132,6 +95,55 @@ public class RecommendService {
                 .toList();
 
         return new RecommendResponse.RecommendResult(totalCredit,getFreeDays(selected),result);
+    }
+
+    private List<Lecture> putRequired(RecommendRequest.createRecommendRequest request) {
+        List<Lecture> selected = new ArrayList<>();
+
+
+        // 사용자가 지정한 필수과목부터 확정
+        List<Long> requiredIds = request.selectedLectureIds();
+
+        // 중복강의 체크
+        if(requiredIds.stream().distinct().toList().size() != requiredIds.size()) {
+            throw new CustomException(RecommendErrorCode.SELECT_DUPLICATED);
+        }
+
+        Map<Long, Lecture> lectureById = lectureRepository.findAllByIdInWithSchedules(requiredIds).stream()
+                .collect(Collectors.toMap(Lecture::getId, l -> l));
+
+        // 30학점 이상 체크
+        if(lectureById.values().stream().mapToInt(Lecture::getCredit).sum() >= 30) {
+            throw new CustomException(RecommendErrorCode.EXCEED_THIRTY);
+        }
+
+        for (Long lectureId : requiredIds) {
+            Lecture lecture = lectureById.getOrDefault(lectureId,null);
+
+            //존재하지 않는 강의
+            if (lecture == null) {
+                throw new CustomException(RecommendErrorCode.LECTURE_NOT_EXISTS);
+            }
+
+
+            if(lecture.getLectureSchedules().stream().map(LectureSchedule::getDayOfWeek)
+                    .anyMatch(request.preferredFreeDays()::contains)) {
+                throw new CustomException(RecommendErrorCode.SELECT_FREE_DAYS);
+            }
+
+            //학기 불일치
+            if(lecture.getSemester() != request.semester()) {
+                throw new CustomException(RecommendErrorCode.SEMESTER_NOT_EQUALS);
+            }
+
+            if (hasTimeConflict(lecture, selected)) {
+                throw new CustomException(RecommendErrorCode.SCHEDULE_OVERLAPPED);
+            }
+            selected.add(lecture);
+        }
+
+        return selected;
+
     }
 
     private List<Week> getFreeDays(List<Lecture> selected) {
