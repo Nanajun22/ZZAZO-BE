@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: zzazo-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MY_SQL_PASSWORD}
+      MYSQL_DATABASE: mydatabase
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD","mysqladmin", "ping", "-h" ,"127.0.0.1", "-u", "root" ,"-p${MY_SQL_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  app:
+    image: nanajun/zzazo:1.12
+    container_name: my-spring
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mydatabase?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_PASSWORD: ${MY_SQL_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_PROFILES_ACTIVE: dev
+    restart: always
+
+volumes:
+  mysql_data:
