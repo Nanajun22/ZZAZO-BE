@@ -8,7 +8,9 @@ import org.example.zzazo.domain.department.repository.DepartmentRepository;
 import org.example.zzazo.domain.lecture.domain.LiberalCategory;
 import org.example.zzazo.domain.lecture.dto.LectureResponse;
 import org.example.zzazo.domain.lecture.entity.Lecture;
+import org.example.zzazo.domain.lecture.exception.LectureErrorCode;
 import org.example.zzazo.domain.lecture.repository.LectureRepository;
+import org.example.zzazo.global.error.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,8 @@ public class LectureService {
     public LectureResponse.LectureList getMajorList(Long departmentId,int semester) {
 
 
+        departmentRepository.findById(departmentId)
+                .orElseThrow(()-> new CustomException(LectureErrorCode.DEPARTMENT_NOT_EXISTS));
 
         List<Curriculum> curriculumList = curriculumRepository
                 .findMajorCurriculumsByDepartmentIdAndSemester(departmentId,semester);

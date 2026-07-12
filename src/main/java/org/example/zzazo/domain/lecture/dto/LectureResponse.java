@@ -59,6 +59,12 @@ public class LectureResponse {
                 @Schema(description = "값", example = "COMMUNICATION")
                 LiberalCategory liberalCategory,
                 @Schema(description = "이름", example = "의사소통")
-                String name) {}
+                String name) {
+
+            public static Category from(LiberalCategory liberalCategory) {
+                return new Category(liberalCategory, liberalCategory.getValue());
+            }
+
+        }
     }
 }

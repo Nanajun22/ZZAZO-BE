@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -57,6 +59,13 @@ public class LectureController implements LectureControllerDocs {
     @Override
     @GetMapping("/liberal-categories")
     public ApiResponse<LectureResponse.LiberalCategoryList> getLiberalCategoryList() {
-        return ApiResponse.success(BaseSuccessCode.GENERAL_OK);
+        LectureResponse.LiberalCategoryList response = new LectureResponse.LiberalCategoryList(
+                Arrays
+                .stream(LiberalCategory.values())
+                .map(LectureResponse.LiberalCategoryList.Category::from)
+                .toList()
+        );
+
+        return ApiResponse.success(BaseSuccessCode.GENERAL_OK,response);
     }
 }
