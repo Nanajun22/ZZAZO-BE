@@ -7,6 +7,7 @@ import org.example.zzazo.domain.curriculum.repository.CurriculumRepository;
 import org.example.zzazo.domain.department.repository.DepartmentRepository;
 import org.example.zzazo.domain.lecture.entity.Lecture;
 import org.example.zzazo.domain.lecture.repository.LectureRepository;
+import org.example.zzazo.domain.recommend.domain.Priority;
 import org.example.zzazo.domain.recommend.dto.RecommendRequest;
 import org.example.zzazo.domain.recommend.dto.RecommendResponse;
 import org.example.zzazo.domain.recommend.exception.RecommendErrorCode;
@@ -62,20 +63,30 @@ public class RecommendService {
                 .sorted(priorityComparator(request.grade()))
                 .toList();
 
-        // 목표학점 도달 전까지 그리디하게 채우기
-        for (Curriculum candidate : candidates) {
-            if (totalCredit >= request.targetCredits()) {
-                break;
-            }
-            Lecture lecture = candidate.getLecture();
-            int nextCredit = totalCredit + lecture.getCredit();
-            if (hasTimeConflict(lecture, selected)) {
-                continue;
-            }
-            selected.add(candidate.getLecture());
-            totalCredit = nextCredit;
+        if(request.priority() == Priority.FREE_PERIOD) {
+            fillGreedyByFreeDays(candidates,selected,request.targetCredits(),request.grade());
+            totalCredit = selected.stream().mapToInt(Lecture::getCredit).sum();
         }
 
+        else {
+
+            // 목표학점 도달 전까지 그리디하게 채우기
+            for (Curriculum candidate : candidates) {
+                if (totalCredit >= request.targetCredits()) {
+                    break;
+                }
+                Lecture lecture = candidate.getLecture();
+                int nextCredit = totalCredit + lecture.getCredit();
+                if (hasTimeConflict(lecture, selected)) {
+                    continue;
+                }
+                if()
+
+                selected.add(candidate.getLecture());
+                totalCredit = nextCredit;
+            }
+
+        }
         List<RecommendResponse.Lecture> result = selected.stream()
                 .map(l -> new RecommendResponse.Lecture(
                         l.getId(),
@@ -145,6 +156,54 @@ public class RecommendService {
         return selected;
 
     }
+
+    private void fillGreedyByFreeDays(List<Curriculum> candidates, List<Lecture> selected,
+                                      int targetCredits, int userGrade) {
+        List<Curriculum> remaining = new ArrayList<>(candidates);
+        int totalCredit = selected.stream().mapToInt(Lecture::getCredit).sum();
+
+        while (totalCredit < targetCredits && !remaining.isEmpty()) {
+            Set<Week> usedDays = selected.stream()
+                    .flatMap(l -> l.getLectureSchedules().stream())
+                    .map(LectureSchedule::getDayOfWeek)
+                    .collect(Collectors.toSet());
+
+            Optional<Curriculum> next = remaining.stream()
+                    .filter(c -> !hasTimeConflict(c.getLecture(), selected))
+                    .min(dynamicFreeDayComparator(userGrade, usedDays));
+
+            if (next.isEmpty()) {
+                break; // 더 이상 넣을 수 있는 후보가 없음
+            }
+
+            Curriculum chosen = next.get();
+            selected.add(chosen.getLecture());
+            totalCredit += chosen.getLecture().getCredit();
+            remaining.remove(chosen);
+        }
+    }
+
+
+    private Comparator<Curriculum> dynamicFreeDayComparator(int userGrade, Set<Week> usedDays) {
+        return Comparator
+                .comparing((Curriculum c) -> c.getGrade() > userGrade)     // 1순위: 학년 이하 그룹
+                .thenComparing(c -> !c.getIsRequired())                    // 2순위: 필수 먼저
+                .thenComparingLong(c -> newDaysCount(c.getLecture(), usedDays)) // 3순위: 새로 늘어나는 요일 최소화
+                .thenComparing(Curriculum::getGrade)
+                .thenComparing(c -> c.getLecture().getCredit());
+    }
+
+    private long newDaysCount(Lecture lecture, Set<Week> usedDays) {
+        return lecture.getLectureSchedules().stream()
+                .map(LectureSchedule::getDayOfWeek)
+                .distinct()
+                .filter(day -> !usedDays.contains(day))
+                .count();
+    }
+
+
+
+
 
     private List<Week> getFreeDays(List<Lecture> selected) {
         Set<Week> usedDays = selected.stream()
