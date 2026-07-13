@@ -3,7 +3,6 @@ package org.example.zzazo.domain.recommend.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import org.example.zzazo.domain.LectureSchedule.entity.LectureSchedule;
 import org.example.zzazo.domain.lecture.domain.LectureClassification;
 import org.example.zzazo.global.common.Week;
 

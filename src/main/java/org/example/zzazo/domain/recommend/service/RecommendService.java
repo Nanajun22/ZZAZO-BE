@@ -1,7 +1,8 @@
 package org.example.zzazo.domain.recommend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.zzazo.domain.LectureSchedule.entity.LectureSchedule;
+
+import org.example.zzazo.domain.lectureschedule.entity.LectureSchedule;
 import org.example.zzazo.domain.curriculum.entity.Curriculum;
 import org.example.zzazo.domain.curriculum.repository.CurriculumRepository;
 import org.example.zzazo.domain.department.repository.DepartmentRepository;
@@ -77,10 +78,11 @@ public class RecommendService {
                 }
                 Lecture lecture = candidate.getLecture();
                 int nextCredit = totalCredit + lecture.getCredit();
-                if (hasTimeConflict(lecture, selected)) {
+
+                if (hasTimeConflict(lecture, selected) || nextCredit >=30 || hasSameLecture(lecture,selected)) {
                     continue;
                 }
-                if()
+
 
                 selected.add(candidate.getLecture());
                 totalCredit = nextCredit;
@@ -177,6 +179,13 @@ public class RecommendService {
             }
 
             Curriculum chosen = next.get();
+
+            if(hasSameLecture(chosen.getLecture(),selected)) {
+                remaining.remove(chosen);
+                continue;
+            }
+
+
             selected.add(chosen.getLecture());
             totalCredit += chosen.getLecture().getCredit();
             remaining.remove(chosen);
@@ -203,7 +212,14 @@ public class RecommendService {
 
 
 
-
+    private boolean hasSameLecture(Lecture candidate, List<Lecture> selected) {
+        for (Lecture l : selected) {
+            if(l.getLectureGroup().getId().equals(candidate.getLectureGroup().getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private List<Week> getFreeDays(List<Lecture> selected) {
         Set<Week> usedDays = selected.stream()

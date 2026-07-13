@@ -11,8 +11,10 @@ import java.util.List;
 public interface CurriculumRepository extends JpaRepository<Curriculum,Long> {
 
 
+    // 시간표 추천 로직 활용 교육과정 조회
     @Query("select distinct c from Curriculum c " +
             "join fetch c.lecture l " +
+            "join fetch l.lectureGroup lg " +
             "left join fetch l.lectureSchedules " +
             "where c.department.id = :departmentId " +
             "and c.lecture.semester = :semester")
@@ -21,8 +23,10 @@ public interface CurriculumRepository extends JpaRepository<Curriculum,Long> {
             @Param("semester") int semester
     );
 
+    // 시간표 추천 로직 활용 교육과정 조회 - 공강 제외
     @Query("select distinct c from Curriculum c " +
             "join fetch c.lecture l " +
+            "join fetch l.lectureGroup lg " +
             "left join fetch l.lectureSchedules " +
             "where c.department.id = :departmentId " +
             "and c.lecture.semester = :semester " +

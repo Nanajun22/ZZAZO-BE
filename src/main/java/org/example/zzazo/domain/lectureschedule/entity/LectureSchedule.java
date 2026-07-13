@@ -1,4 +1,4 @@
-package org.example.zzazo.domain.LectureSchedule.entity;
+package org.example.zzazo.domain.lectureschedule.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

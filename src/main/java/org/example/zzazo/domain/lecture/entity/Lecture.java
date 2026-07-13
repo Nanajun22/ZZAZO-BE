@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.zzazo.domain.LectureSchedule.entity.LectureSchedule;
+import org.example.zzazo.domain.lecturegroup.entity.LectureGroup;
+import org.example.zzazo.domain.lectureschedule.entity.LectureSchedule;
 import org.example.zzazo.domain.lecture.domain.LectureClassification;
 import org.example.zzazo.domain.lecture.domain.LiberalCategory;
 
@@ -53,27 +54,12 @@ public class Lecture {
     private String courseCode;
 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_group_id",nullable = false)
+    private LectureGroup lectureGroup;
+
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LectureSchedule> lectureSchedules = new ArrayList<>();
 
-
-    @Builder
-    private Lecture(String name,
-                    LectureClassification lectureClassification,
-                    int year,
-                    int grade,
-                    String classroom,
-                    String professor,
-                    String courseCode
-    ) {
-        this.name = name;
-        this.lectureClassification = lectureClassification;
-        this.year = year;
-        this.grade = grade;
-        this.classroom = classroom;
-        this.professor = professor;
-        this.courseCode = courseCode;
-
-    }
 
 }
