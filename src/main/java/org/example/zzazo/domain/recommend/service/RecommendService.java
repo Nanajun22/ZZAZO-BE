@@ -64,6 +64,7 @@ public class RecommendService {
                 .sorted(priorityComparator(request.grade()))
                 .toList();
 
+
         if(request.priority() == Priority.FREE_PERIOD) {
             fillGreedyByFreeDays(candidates,selected,request.targetCredits(),request.grade());
             totalCredit = selected.stream().mapToInt(Lecture::getCredit).sum();
@@ -89,26 +90,32 @@ public class RecommendService {
             }
 
         }
+
+        // 목표학점 도달 전까지 그리디하게 채우기
+        for (Curriculum candidate : candidates) {
+            if (totalCredit >= request.targetCredits()) {
+                break;
+            }
+            Lecture lecture = candidate.getLecture();
+            int nextCredit = totalCredit + lecture.getCredit();
+            if (hasTimeConflict(lecture, selected) || nextCredit >=30) {
+                continue;
+            }
+            selected.add(candidate.getLecture());
+            totalCredit = nextCredit;
+        }
+
+        if(totalCredit < request.targetCredits()) {
+            throw new CustomException(RecommendErrorCode.RECOMMEND_NOT_EXISTS);
+        }
+
         List<RecommendResponse.Lecture> result = selected.stream()
-                .map(l -> new RecommendResponse.Lecture(
-                        l.getId(),
-                        l.getName(),
-                        l.getCredit(),
-                        l.getProfessor(),
-                        l.getClassroom(),
-                        l.getLectureClassification(),
-                        l.getLectureSchedules().stream()
-                                .map(lectureSchedule -> new RecommendResponse.Lecture.LectureTime(
-                                        lectureSchedule.getStartTime(),
-                                        lectureSchedule.getEndTime(),
-                                        lectureSchedule.getDayOfWeek()
-                                )).toList()
-                        )
-                )
+                .map(RecommendResponse.Lecture::from)
                 .toList();
 
         return new RecommendResponse.RecommendResult(totalCredit,getFreeDays(selected),result);
     }
+
 
     private List<Lecture> putRequired(RecommendRequest.createRecommendRequest request) {
         List<Lecture> selected = new ArrayList<>();

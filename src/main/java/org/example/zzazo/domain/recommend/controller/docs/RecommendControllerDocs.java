@@ -56,7 +56,7 @@ public interface RecommendControllerDocs {
                               "message": "요청 응답 성공",
                               "data": {
                                 "totalCredits": 20,
-                                "satisfiedFreeDays": ["FRI"],
+                                "preferredFreeDays": ["FRI"],
                                 "timetables": [
                                   {
                                     "lectureId": 13,

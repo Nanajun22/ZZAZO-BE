@@ -21,10 +21,10 @@ public class LectureSchedule {
     @Column(name = "day_of_week",nullable = false, length = 10)
     private Week dayOfWeek;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time",nullable = false)
     private LocalTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time",nullable = false)
     private LocalTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
