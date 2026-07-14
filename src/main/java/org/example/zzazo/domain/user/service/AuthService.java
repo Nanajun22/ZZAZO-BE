@@ -40,7 +40,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    @Value("${mail.fixed-auth-code:}")
+    @Value("${spring.mail.fixed-auth-code:}")
     private String fixedAuthCode;
 
     @Value("${app.email-verification.expiration-minutes}")
