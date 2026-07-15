@@ -78,6 +78,7 @@ public class RecommendRequest {
             public createRecommendRequest {
                     selectedLectureIds = selectedLectureIds == null ? List.of() : selectedLectureIds;
                     preferredFreeDays = preferredFreeDays == null ? List.of() : preferredFreeDays;
+                    targetCredits = targetCredits == null ? 18 : targetCredits;
             }
 
     }
