@@ -96,7 +96,7 @@ public interface TimetableControllerDocs {
             )
     )
     @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content)
-    ResponseEntity<TimetableListResponse> getTimetables();
+    org.example.zzazo.global.common.ApiResponse<TimetableListResponse> getTimetables();
 
     @Operation(
             summary = "저장한 시간표 상세 조회",
@@ -160,7 +160,7 @@ public interface TimetableControllerDocs {
     @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content)
     @ApiResponse(responseCode = "403", description = "다른 사용자의 시간표 접근", content = @Content)
     @ApiResponse(responseCode = "404", description = "시간표 없음", content = @Content)
-    ResponseEntity<TimetableDetailResponse> getTimetable(
+    org.example.zzazo.global.common.ApiResponse<TimetableDetailResponse> getTimetable(
             @Parameter(description = "저장 시간표 ID", example = "1")
             Long timetableId
     );

@@ -41,16 +41,16 @@ public class TimetableController implements TimetableControllerDocs {
 
     @Override
     @GetMapping
-    public ResponseEntity<TimetableListResponse> getTimetables() {
-        return ResponseEntity.ok(TimetableListResponse.example());
+    public ApiResponse<TimetableListResponse> getTimetables() {
+        return ApiResponse.success(BaseSuccessCode.GENERAL_OK, TimetableListResponse.example());
     }
 
     @Override
     @GetMapping("/{timetableId}")
-    public ResponseEntity<TimetableDetailResponse> getTimetable(
+    public ApiResponse<TimetableDetailResponse> getTimetable(
             @PathVariable Long timetableId
     ) {
-        return ResponseEntity.ok(TimetableDetailResponse.example(timetableId));
+        return ApiResponse.success(BaseSuccessCode.GENERAL_OK, TimetableDetailResponse.example(timetableId));
     }
 
     @Override
