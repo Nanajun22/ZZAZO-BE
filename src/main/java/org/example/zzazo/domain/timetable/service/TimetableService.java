@@ -2,12 +2,12 @@ package org.example.zzazo.domain.timetable.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.example.zzazo.domain.lecture.entity.Lecture;
+import org.example.zzazo.domain.lecture.repository.LectureRepository;
 import org.example.zzazo.domain.timetable.dto.TimetableCreateRequest;
 import org.example.zzazo.domain.timetable.dto.TimetableCreateResponse;
-import org.example.zzazo.domain.timetable.entity.Lecture;
 import org.example.zzazo.domain.timetable.entity.Timetable;
 import org.example.zzazo.domain.timetable.entity.TimetableLecture;
-import org.example.zzazo.domain.timetable.repository.LectureRepository;
 import org.example.zzazo.domain.timetable.repository.TimetableLectureRepository;
 import org.example.zzazo.domain.timetable.repository.TimetableRepository;
 import org.example.zzazo.domain.user.entity.User;
