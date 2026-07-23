@@ -8,7 +8,6 @@ server:
 
 
 spring:
-
   sql:
     init:
       mode: always # data.sql 로컬 테스트용

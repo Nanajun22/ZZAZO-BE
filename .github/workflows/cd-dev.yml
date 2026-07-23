@@ -3,13 +3,12 @@ name: "[CD] 개발 서버 자동/수동 배포"
 on:
   push:
     branches: [ "main" ]
-
   workflow_dispatch:
 
 jobs:
   deploy:
-    # 앞선 CI가 성공했을 때나, 수동 버튼(workflow_dispatch)을 눌렀을 때만 실행
-    if: ${{ github.repository == 'Leets-Official/ZZAZO-BE' || github.event_name == 'workflow_dispatch' }}
+    # 리츠일 때 혹은 수동 버튼(workflow_dispatch)을 눌렀을 때만 실행
+    if: ${{ github.repository == 'Leets-Official/ZZAZO-BE' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +66,7 @@ jobs:
             # 최신 도커 이미지 당겨오고 컨테이너 무중단 교체
             sudo docker compose -f docker-compose-dev.yml pull
             sudo docker compose -f docker-compose-dev.yml down --remove-orphans
-            sudo docker compose -f docker-compose-dev.yml up -d --build
+            sudo docker compose -f docker-compose-dev.yml up -d
             
             # 안 쓰는 이전 구버전 이미지 삭제 (디스크 관리)
             sudo docker image prune -f
