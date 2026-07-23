@@ -2,6 +2,7 @@ package org.example.zzazo.domain.timetable.dto;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.example.zzazo.domain.timetable.entity.Timetable;
 import org.example.zzazo.global.common.Week;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,12 @@ public record TimetableListResponse(
         @ArraySchema(schema = @Schema(implementation = TimetableSummaryResponse.class))
         List<TimetableSummaryResponse> timetables
 ) {
+
+    public static TimetableListResponse from(List<Timetable> timetables) {
+        return new TimetableListResponse(timetables.stream()
+                .map(TimetableSummaryResponse::from)
+                .toList());
+    }
 
     public static TimetableListResponse example() {
         return new TimetableListResponse(List.of(TimetableSummaryResponse.example()));
@@ -37,6 +44,17 @@ public record TimetableListResponse(
             @Schema(description = "저장 일시", example = "2026-07-20T12:00:00")
             LocalDateTime createdAt
     ) {
+
+        public static TimetableSummaryResponse from(Timetable timetable) {
+            return new TimetableSummaryResponse(
+                    timetable.getTimetableId(),
+                    timetable.getCandidateName(),
+                    timetable.getDepartmentId(),
+                    timetable.getTotalCredits(),
+                    timetable.getPreferredFreeDays(),
+                    timetable.getCreatedAt()
+            );
+        }
 
         public static TimetableSummaryResponse example() {
             return new TimetableSummaryResponse(

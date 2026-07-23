@@ -42,7 +42,8 @@ public class TimetableController implements TimetableControllerDocs {
     @Override
     @GetMapping
     public ApiResponse<TimetableListResponse> getTimetables() {
-        return ApiResponse.success(BaseSuccessCode.GENERAL_OK, TimetableListResponse.example());
+        TimetableListResponse response = timetableService.getTimetables();
+        return ApiResponse.success(BaseSuccessCode.GENERAL_OK, response);
     }
 
     @Override

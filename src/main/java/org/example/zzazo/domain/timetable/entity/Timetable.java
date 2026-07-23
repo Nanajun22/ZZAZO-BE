@@ -1,6 +1,16 @@
 package org.example.zzazo.domain.timetable.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
 import org.example.zzazo.domain.user.entity.User;
 import org.example.zzazo.global.common.Week;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,6 +21,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "timetable")
+@Getter
 public class Timetable {
 
     @Id
@@ -78,7 +89,4 @@ public class Timetable {
         this.semester = semester;
     }
 
-    public Long getTimetableId() {
-        return timetableId;
-    }
 }
