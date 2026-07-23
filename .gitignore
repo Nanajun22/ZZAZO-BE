@@ -39,7 +39,6 @@ out/
 ### env ###
 
 .env
-init.sql
 
 docker-compose.yml
 src/main/resources/data.sql
