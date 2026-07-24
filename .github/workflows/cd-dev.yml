@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    # 리츠일 때 혹은 수동 버튼(workflow_dispatch)을 눌렀을 때만 실행
     if: ${{ github.repository == 'Leets-Official/ZZAZO-BE' }}
     runs-on: ubuntu-latest
 
